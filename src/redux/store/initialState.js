@@ -1,4 +1,9 @@
 const initialState = {
+    user: {
+        uid: null,
+        isSignedIn: false,
+        username: '', 
+    },
     todos: [
         // {
         //    num: '0',

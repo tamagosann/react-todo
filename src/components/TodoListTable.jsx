@@ -20,15 +20,27 @@ const useStyles = makeStyles({
   noTodo: {
       height: 80,
       textAlign: 'center',
+  },
+  fight: {
+    fontWeight: 'bold',
+    fontSize: '20px',
+    position: 'relative',
+  },
+  mr20: {
+    marginRight: 20,
+  },
+  fiGit: {
+    color: 'red'
+  },
 
-  }
 });
 
 const TodoListTable = () => {
   const classes = useStyles();
-  const selector = useSelector((state) => state);
   const dispatch = useDispatch();
   const history = useHistory();
+
+  const selector = useSelector((state) => state);
   const todos = getTodos(selector);
   console.log(todos);
 
@@ -40,10 +52,17 @@ const TodoListTable = () => {
     [history]
   );
 
-  const deleteTodoOnClicked = (event, num) => {
+  const deleteTodoOnClicked = (event, todoId) => {
+    console.log(todoId)
     event.stopPropagation();
-    dispatch(deleteTodo(num));
+    dispatch(deleteTodo(todoId));
   };
+
+  const message = {
+    fight: 'いい感じ！',
+    last: 'もう少し！',
+    complete: '完了！',
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -60,14 +79,13 @@ const TodoListTable = () => {
         </TableHead>
         <TableBody>
           {todos.length === 0 && (
-            <TableRow>
+              <TableRow>
                 <TableCell colSpan={5} align="center">todoが全て終了しました。</TableCell>
             </TableRow>
           )}
-          {todos.length > 0 &&
-            todos.map((todo) => (
+          {todos.length > 0 && (todos.map((todo) => (
               <TableRow
-                key={todo.num}
+                key={todo.todoId}
                 onClick={() => {
                   LinkToEachTodo(todo.num.toString());
                 }}
@@ -77,14 +95,23 @@ const TodoListTable = () => {
                 </TableCell>
                 <TableCell align="right">{todo.num}</TableCell>
                 <TableCell align="right">{todo.chargedBy}</TableCell>
-                <TableCell align="right">{todo.progress}</TableCell>
+                <TableCell align="right">
+                  <div className={classes.fight}>
+                    <span className={classes.mr20}>
+                      {todo.progress >= 40 && todo.progress <= 60 && message.fight }
+                      {todo.progress >= 70 && todo.progress <= 90 && message.last }
+                      {todo.progress === 100 && message.complete }
+                    </span>
+                  {todo.progress + ' ' + '%'}
+                  </div>
+                </TableCell>
                 <TableCell align="right">
                   <DeleteIcon
-                    onClick={(event) => deleteTodoOnClicked(event, todo.num)}
+                    onClick={(event) => deleteTodoOnClicked(event, todo.todoId)}
                   />
                 </TableCell>
               </TableRow>
-            ))}
+            )))}
         </TableBody>
       </Table>
     </TableContainer>

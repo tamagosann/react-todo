@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import { GreyButton, PrimaryButton, Selector } from '../components/UIKit';
 import { Avatar, List, ListItem, ListItemAvatar, ListItemText, makeStyles, Paper } from '@material-ui/core';
-import { getTodos } from '../redux/todos/selectors';
+import { getTodos, getUid } from '../redux/todos/selectors';
 import TodoDetailListItem from '../components/TodoDetailListItem';
 import { changeTodoProgress } from '../redux/todos/operations';
 
@@ -35,19 +35,20 @@ const TodoDetail = () => {
     const { num } = useParams();
     const selector = useSelector(state => state);
     const todos = getTodos(selector);
+    const uid = getUid(selector)
 
     const index = todos.findIndex(todo => {
         return todo.num === num
     })
     const todo = todos[index];
-    const [progress, setProgress] = useState(todo.progress);
+    const [progress, setProgress] = useState(todo ? todo.progress : 0);
 
     const selectorOnChange = useCallback((event) => {
         setProgress(event.target.value);
     },[setProgress]);
 
-    const changeTodoProgressOnClicked = (num, previousProgress, progress) => {
-        dispatch(changeTodoProgress(num, progress));
+    const changeTodoProgressOnClicked = (todoId, previousProgress, progress, todo) => {
+        dispatch(changeTodoProgress(todoId, progress, todo));
         alert(`進捗度を、${previousProgress}%から${progress}%へ変更しました。`)
     }
 
@@ -57,17 +58,17 @@ const TodoDetail = () => {
             <h2 className={classes.center}>チケット詳細</h2>
 
             <List>
-                <TodoDetailListItem text={todo.todoName} label={'チケット名'}/>
-                <TodoDetailListItem text={todo.detail} label={'詳細'}/>
-                <TodoDetailListItem text={todo.chargedBy} label={'担当者'}/>
-                <TodoDetailListItem text={todo.deadline} label={'締め切り'}/>
-                <TodoDetailListItem text={todo.startDate} label={'開始日'}/>
-                <TodoDetailListItem text={todo.progress} label={'進捗'}/>
-                <Selector progress={progress} label={'進捗変更'} onChange={(event) =>  selectorOnChange(event)}/>
+                <TodoDetailListItem text={todo ? todo.todoName : ''} label={'チケット名'}/>
+                <TodoDetailListItem text={todo ? todo.detail: ''} label={'詳細'}/>
+                <TodoDetailListItem text={todo ? todo.chargedBy: ''} label={'担当者'}/>
+                <TodoDetailListItem text={todo ? todo.deadline: ''} label={'締め切り'}/>
+                <TodoDetailListItem text={todo ? todo.startDate : ''} label={'開始日'}/>
+                <TodoDetailListItem text={todo ? todo.progress + '%' : ''} label={'進捗'}/>
+                <Selector progress={progress} label={'進捗変更'} onChange={(event) => selectorOnChange(event)}/>
             </List>
             
             <div className={classes.center + ' ' + classes.mt20}>
-                <PrimaryButton className={classes.mr20} label={'更新'} onClick={() => changeTodoProgressOnClicked(todo.num, todo.progress, progress)}/>
+                <PrimaryButton className={classes.mr20} label={'更新'} onClick={() => changeTodoProgressOnClicked(todo.todoId, todo.progress, progress, todo)}/>
                 <Link to={'/'}>
                     <GreyButton label={'一覧へ戻る'} />
                 </Link >

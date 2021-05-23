@@ -3,16 +3,20 @@ import {
     Switch,
     Route,
 } from 'react-router-dom';
-import { TodoList, TodoAdd, TodoDetail } from './templates';
+import Auth from './Auth';
+import { TodoList, TodoAdd, TodoDetail, LogIn } from './templates';
 
 
 const Router = () => {
     return (
         <Switch>
-            <Route exact path={'/add'} component={TodoAdd} />
-            <Route path={'/detail/:num'} component={TodoDetail} />
-            <Route exact path={'/'} component={TodoList} />
-            {/* <Route path={"/product/edit(/:id)?"} component={ProductEdit} /> */}
+            <Route exact path={'/login'} component={LogIn} />
+            <Auth>
+                <Route exact path={'/add'} component={TodoAdd} />
+                <Route path={'/detail/:num'} component={TodoDetail} />
+                <Route exact path={'/'} component={TodoList} />
+                {/* <Route path={"/product/edit(/:id)?"} component={ProductEdit} /> */}
+            </Auth>
         </Switch>
     )
 }
